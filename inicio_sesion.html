@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Permite que la página sea responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>inicio de sesion </title>
+
+    <!-- Ícono de la pestaña del navegador -->
+    <link rel="icon" type="image/png" href="imagenes/reserva.png">
+    <link rel="stylesheet" href="cssgeneral.css">
+    <!-- Bootstrap 5: Framework CSS para estilos y diseño responsive -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+          crossorigin="anonymous">
+</head>
+
+<body class="bg-light">
+<!-- Barra superior -->
+<nav class="navbar bg-dark navbar-dark">
+    <div class="container-fluid">
+
+        <a href="index.html" class="navbar-brand">
+            <img src="imagenes/image__1_-removebg-preview.png"
+                 alt="Logo"
+                 width="90"
+                 height="90"
+                 class="d-inline-block align-text-top">
+        </a>
+
+    </div>
+</nav>
+<!--
+container: contenedor principal
+vh-100: ocupa el 100% de la altura de la pantalla
+d-flex: activa Flexbox
+justify-content-center: centra horizontalmente
+align-items-center: centra verticalmente
+-->
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+
+    <!-- Tarjeta que contiene los formularios -->
+    <div class="card shadow" style="width: 400px;">
+        <div class="card-body">
+
+            <!-- Menú de pestañas -->
+            <ul class="nav nav-tabs mb-4" id="tabs">
+
+                <!-- Pestaña de Inicio de Sesión -->
+                <li class="nav-item">
+                    <button class="nav-link active"
+                            data-bs-toggle="tab"
+                            data-bs-target="#login">
+                        Iniciar Sesión
+                    </button>
+                </li>
+
+                <!-- Pestaña de Registro -->
+                <li class="nav-item">
+                    <button class="nav-link"
+                            data-bs-toggle="tab"
+                            data-bs-target="#registro">
+                        Registrarse
+                    </button>
+                </li>
+
+            </ul>
+
+            <!-- Contenido de las pestañas -->
+            <div class="tab-content">
+
+                <!-- FORMULARIO LOGIN -->
+                <div class="tab-pane fade show active" id="login">
+
+                    <h4 class="text-center mb-3">Iniciar Sesión</h4>
+
+                    <form>
+
+                        <!-- Campo correo -->
+                        <div class="mb-3">
+                            <label class="form-label">Correo</label>
+                            <input type="email"
+                                   class="form-control"
+                                   placeholder="correo@ejemplo.com">
+                        </div>
+
+                        <!-- Campo contraseña -->
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password"
+                                   class="form-control"
+                                   placeholder="********">
+                        </div>
+
+                        <!-- Botón de acceso -->
+                        <button type="submit" class="btn btn-primary w-100">
+                            Ingresar
+                        </button>
+
+                    </form>
+
+                </div>
+
+                <!-- FORMULARIO REGISTRO -->
+                <div class="tab-pane fade" id="registro">
+
+                    <h4 class="text-center mb-3">Registrarse</h4>
+
+                    <form>
+
+                        <!-- Nombre del usuario -->
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Nombre completo">
+                        </div>
+
+                        <!-- Correo electrónico -->
+                        <div class="mb-3">
+                            <label class="form-label">Correo</label>
+                            <input type="email"
+                                   class="form-control"
+                                   placeholder="correo@ejemplo.com">
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password"
+                                   class="form-control"
+                                   placeholder="********">
+                        </div>
+
+                        <!-- Botón para crear cuenta -->
+                        <button type="submit" class="btn btn-success w-100">
+                            Crear Cuenta
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- JavaScript de Bootstrap para que funcionen las pestañas -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
