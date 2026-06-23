@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}Nueva Reserva - {{ negocio.nombre }}{% endblock %}
+{% block estilos %}
+    <link rel="stylesheet" href="{% static 'app_reservas/reservas.css' %}">
+{% endblock %}
+
+{% block contenido %}
+<main class="container py-5">
+
+    <div class="mb-4">
+        <a href="{% url 'sitio_detalle' negocio.id %}" class="btn-volver text-decoration-none">← VOLVER</a>
+    </div>
+
+    <header class="mb-5">
+        <span class="text-accent text-uppercase fw-bold d-block mb-1" style="letter-spacing: 0.05em; font-size: 0.9rem;">Nueva reserva</span>
+        <h1 class="display-4 fw-black text-dark mb-2" style="font-weight: 800;">Reserve su mesa en {{ negocio.nombre }}</h1>
+        <p class="lead text-muted m-0">Complete sus datos. Le confirmaremos su reserva por correo electrónico.</p>
+    </header>
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="custom-container shadow-sm">
+
+            <div class="mb-5">
+                <h2 class="form-section-title text-dark">Datos Personales</h2>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold text-dark">Nombre Completo</label>
+                        {{ form.nombre_cliente }}
+                        {% for error in form.nombre_cliente.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Correo Electrónico</label>
+                        {{ form.email_cliente }}
+                        {% for error in form.email_cliente.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Teléfono</label>
+                        {{ form.telefono_cliente }}
+                        {% for error in form.telefono_cliente.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <h2 class="form-section-title text-dark">Fecha y Hora</h2>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Fecha de la Reserva</label>
+                        {{ form.fecha }}
+                        {% for error in form.fecha.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Cantidad de Comensales</label>
+                        {{ form.comensales }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-dark d-block mb-3">Seleccione la Hora</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for valor, etiqueta in form.fields.hora.choices %}
+                            <label class="btn btn-hora">
+                                <input type="radio" name="hora" value="{{ valor }}" class="d-none" required> {{ etiqueta }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                    {% for error in form.hora.errors %}<div class="text-danger small mt-2">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <h2 class="form-section-title text-dark">Detalles Adicionales</h2>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold text-dark">Ocasión Especial</label>
+                        {{ form.ocasion }}
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label class="form-label fw-semibold text-dark">Notas (opcional)</label>
+                        {{ form.notas }}
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-confirmar-reserva w-100 mt-4">Confirmar Reserva</button>
+        </div>
+    </form>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Resalta visualmente el botón de hora seleccionado
+    document.querySelectorAll('input[name="hora"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.querySelectorAll('.btn-hora').forEach(b => b.classList.remove('active'));
+            radio.closest('.btn-hora').classList.add('active');
+        });
+    });
+</script>
+{% endblock %}
