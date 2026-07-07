@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}{{ negocio.nombre }} - CLICK&GO{% endblock %}
+{% block estilos %}
+    <link rel="stylesheet" href="{% static 'app_reservas/sitio.css' %}">
+{% endblock %}
+
+{% block contenido %}
+<main class="container py-5">
+
+    <div class="mb-4">
+        <a href="{% url 'index' %}" class="btn-volver text-decoration-none">← VOLVER AL INICIO</a>
+    </div>
+
+    <div class="row g-4">
+        <section class="col-lg-8">
+            <div class="mb-4">
+                {% if negocio.imagen_hero %}
+                    <img src="{{ negocio.imagen_hero.url }}" class="restaurant-hero-img img-fluid shadow-sm" alt="Fachada">
+                {% else %}
+                    <img src="{% static 'app_reservas/imagenes/Proximamente.png' %}" class="restaurant-hero-img img-fluid shadow-sm" alt="Próximamente">
+                {% endif %}
+            </div>
+
+            <div class="custom-card shadow-sm mb-4">
+                <span class="text-accent text-uppercase fw-bold d-block mb-1" style="letter-spacing: 0.05em; font-size: 0.9rem;">Sede</span>
+                <h1 class="display-5 fw-bold text-dark mb-3" style="font-weight: 800;">{{ negocio.nombre }}</h1>
+                <p class="lead text-muted">{{ negocio.descripcion }}</p>
+
+                <hr class="my-4" style="border-top: 1px solid #000000;">
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h3 class="fs-6 fw-bold text-uppercase mb-2">📍 Dirección</h3>
+                        <p class="restaurant-meta m-0">{{ negocio.direccion }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="fs-6 fw-bold text-uppercase mb-2">📞 Teléfono</h3>
+                        <p class="restaurant-meta m-0">{{ negocio.telefono }}</p>
+                    </div>
+                    <div class="col-md-12 mt-4">
+                        <h3 class="fs-6 fw-bold text-uppercase mb-2">🕒 Horarios de Atención</h3>
+                        {% for h in horarios %}
+                            <p class="restaurant-meta m-0">{{ h.get_dia_semana_display }}: {{ h.hora_apertura }} - {{ h.hora_cierre }}</p>
+                        {% empty %}
+                            <p class="restaurant-meta m-0">Horario no publicado aún.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="col-lg-4">
+            <div class="custom-card shadow-sm sticky-top" style="top: 2rem;">
+                <h3 class="fw-bold text-dark mb-4" style="font-size: 1.2rem; letter-spacing: 0.05em; border-bottom: 2px solid #000000; padding-bottom: 0.5rem; text-transform: uppercase;">ACCIONES DISPONIBLES</h3>
+
+                <p class="text-muted small mb-4">
+                    Reserva tu mesa en línea o administra las reservas existentes.
+                </p>
+
+                <div class="mb-3">
+                    <a href="{% url 'nueva_reserva' negocio.id %}" class="btn-primary-custom text-decoration-none">
+                        Realizar Nueva Reserva &gt;
+                    </a>
+                </div>
+
+                {% if user.is_authenticated and user.is_administrador %}
+                <div>
+                    <a href="{% url 'panel_admin' negocio.id %}" class="btn-secondary-custom text-decoration-none">
+                        Ver Panel de Administración
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </aside>
+    </div>
+</main>
+{% endblock %}
