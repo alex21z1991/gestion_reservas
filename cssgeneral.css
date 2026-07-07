@@ -26,14 +26,7 @@
 .navbar .btn:hover{
     transform:scale(1.05);
 }
-.btn-volver {
-    color: #212529;
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    transition: color 0.2s ease;
-}
-.btn-volver:hover { color: #FF914D; }
+
 /* =========================
    FOOTER
 ========================= */
