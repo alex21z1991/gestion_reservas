@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}Mis Reservas - ClickyGo{% endblock %}
+
+{% block estilos %}
+    <link rel="stylesheet" href="{% static 'app_reservas/mis_reservas.css' %}">
+{% endblock %}
+
+{% block contenido %}
+<main class="container py-5 animated-fade-in">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h1 class="display-5 fw-bold mb-1">Mis Reservas</h1>
+            <p class="lead text-white-50 m-0">Gestiona tus reservas y visualiza tu historial en un solo lugar.</p>
+        </div>
+        <div>
+            <a href="{% url 'index' %}" class="btn btn-light px-4 py-2 fw-bold text-dark rounded-3 shadow-sm hover-up">
+                + Nueva Reserva
+            </a>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Estadísticas -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Total Reservas</h3>
+                        <div class="stat-num text-dark">{{ total_reservas }}</div>
+                    </div>
+                    <div class="fs-1 text-muted opacity-50">📅</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="border-left: 4px solid #198754;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Activas / Confirmadas</h3>
+                        <div class="stat-num text-success">{{ activas }}</div>
+                    </div>
+                    <div class="fs-1 text-success opacity-50">✅</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="border-left: 4px solid #dc3545;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Canceladas</h3>
+                        <div class="stat-num text-danger">{{ canceladas }}</div>
+                    </div>
+                    <div class="fs-1 text-danger opacity-50">❌</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Listado de Reservas -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="h4 fw-bold mb-4 text-dark">Historial de Reservas</h2>
+            
+            {% for r in reservas %}
+                <div class="reserva-card">
+                    <div class="reserva-card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fs-4">🍽️</span>
+                            <div>
+                                <h3 class="h5 fw-bold text-dark m-0">{{ r.negocio.nombre }}</h3>
+                                <span class="text-muted small">Código: {{ r.codigo_reserva }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge-estado {% if r.estado == 'Confirmada' %}badge-confirmada{% else %}badge-cancelada{% endif %}">
+                                {{ r.estado }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="reserva-card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6 col-md-3">
+                                <div class="reserva-meta-item">
+                                    <span class="reserva-meta-icon">📅</span>
+                                    <div>
+                                        <div class="small text-muted">Fecha</div>
+                                        <div class="fw-semibold">{{ r.fecha|date:"d-m-Y" }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="reserva-meta-item">
+                                    <span class="reserva-meta-icon">⏰</span>
+                                    <div>
+                                        <div class="small text-muted">Hora</div>
+                                        <div class="fw-semibold">{{ r.hora }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="reserva-meta-item">
+                                    <span class="reserva-meta-icon">👥</span>
+                                    <div>
+                                        <div class="small text-muted">Comensales</div>
+                                        <div class="fw-semibold">{{ r.comensales }} {% if r.comensales == 1 %}persona{% else %}personas{% endif %}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="reserva-meta-item">
+                                    <span class="reserva-meta-icon">✨</span>
+                                    <div>
+                                        <div class="small text-muted">Ocasión</div>
+                                        <div class="fw-semibold text-accent">{{ r.ocasion }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if r.notas %}
+                            <div class="p-3 bg-light rounded-3 mb-4">
+                                <div class="small text-muted fw-bold mb-1">Notas especiales:</div>
+                                <p class="text-secondary m-0 small">{{ r.notas }}</p>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-flex flex-wrap justify-content-end gap-2 border-top pt-3">
+                            <a href="{% url 'sitio_detalle' r.negocio.id %}" class="btn btn-ver-negocio">
+                                Ver Local
+                            </a>
+                            
+                            {% if r.estado == 'Confirmada' %}
+                                <button type="button" 
+                                        class="btn btn-action-cancelar" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#cancelModal" 
+                                        data-reserva-id="{{ r.id }}"
+                                        data-negocio-nombre="{{ r.negocio.nombre }}"
+                                        data-reserva-codigo="{{ r.codigo_reserva }}">
+                                    Cancelar Reserva
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📅</div>
+                    <h3 class="h4 fw-bold text-dark mb-2">No tienes reservas</h3>
+                    <p class="text-muted mb-4">Parece que aún no has reservado en ningún local. ¡Encuentra tu lugar favorito hoy!</p>
+                    <a href="{% url 'index' %}" class="btn btn-dark px-4 py-2 rounded-3 fw-bold">
+                        Explorar Locales
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+
+<!-- Modal de Confirmación de Cancelación -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-0 bg-danger text-white rounded-top-4 py-3">
+                <h5 class="modal-title fw-bold" id="cancelModalLabel">⚠️ Confirmar Cancelación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="text-dark mb-2">¿Estás seguro de que deseas cancelar la siguiente reserva?</p>
+                <div class="p-3 bg-light rounded-3 mb-3 border">
+                    <div class="fw-bold text-dark" id="modalNegocio">Local</div>
+                    <div class="small text-muted" id="modalCodigo">Código: </div>
+                </div>
+                <p class="text-danger small mb-0 fw-semibold">Esta acción no se puede deshacer y el horario quedará liberado inmediatamente.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Cerrar</button>
+                <form id="cancelForm" method="post" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4 fw-bold">Sí, Cancelar Reserva</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Asigna dinámicamente los datos de la reserva seleccionada al Modal de Confirmación
+    const cancelModal = document.getElementById('cancelModal');
+    if (cancelModal) {
+        cancelModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const reservaId = button.getAttribute('data-reserva-id');
+            const negocioNombre = button.getAttribute('data-negocio-nombre');
+            const reservaCodigo = button.getAttribute('data-reserva-codigo');
+            
+            // Rellenar información en el modal
+            document.getElementById('modalNegocio').textContent = negocioNombre;
+            document.getElementById('modalCodigo').textContent = `Código de reserva: ${reservaCodigo}`;
+            
+            // Actualizar la URL de acción del formulario de cancelación
+            const cancelForm = document.getElementById('cancelForm');
+            cancelForm.action = `/admin-reservas/cancelar/${reservaId}/`;
+        });
+    }
+</script>
+{% endblock %}

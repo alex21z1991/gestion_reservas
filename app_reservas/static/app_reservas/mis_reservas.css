@@ -1,0 +1,172 @@
+/* app_reservas/static/app_reservas/mis_reservas.css */
+
+body {
+    background-color: #f8f9fa;
+    color: #212529;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.text-accent {
+    color: #FF914D !important;
+}
+
+.dashboard-header {
+    background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.stat-num {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+/* Card de Reserva */
+.reserva-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    margin-bottom: 1.5rem;
+}
+
+.reserva-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+}
+
+.reserva-card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #f1f3f5;
+    padding: 1.25rem 1.5rem;
+}
+
+.reserva-card-body {
+    padding: 1.5rem;
+}
+
+.reserva-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #495057;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.reserva-meta-icon {
+    width: 20px;
+    text-align: center;
+    color: #adb5bd;
+}
+
+.badge-estado {
+    border-radius: 30px !important;
+    padding: 0.5em 1em;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    display: inline-block;
+}
+
+.badge-confirmada {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.badge-cancelada {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+/* Botones */
+.btn-action-cancelar {
+    background-color: #dc3545;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(220, 53, 69, 0.15);
+}
+
+.btn-action-cancelar:hover {
+    background-color: #bb2d3b;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.25);
+}
+
+.btn-action-cancelar:active {
+    transform: translateY(0);
+}
+
+.btn-ver-negocio {
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.btn-ver-negocio:hover {
+    background-color: #dee2e6;
+    color: #212529;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animated-fade-in {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+/* Empty State */
+.empty-state {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 4rem 2rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1.5rem;
+}
