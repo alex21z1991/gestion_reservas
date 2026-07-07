@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}ClickyGo{% endblock %}
+{% block estilos %}
+    <link rel="stylesheet" href="{% static 'app_reservas/sitio_principal.css' %}">
+{% endblock %}
+
+{% block contenido %}
+
+<section class="hero">
+    <img src="{% static 'app_reservas/imagenes/image__1_-removebg-preview.png' %}" class="logo-principal">
+    <h1 class="display-4 fw-bold">Reserva en tus lugares favoritos</h1>
+    <p class="lead">Encuentra restaurantes, cafeterías y mucho más.</p>
+</section>
+
+<div class="container my-5">
+    <div class="input-group shadow">
+        <span class="input-group-text">buscar</span>
+        <input type="text" id="buscador" class="form-control" placeholder="Buscar sitio...">
+    </div>
+</div>
+
+<div id="sitios" class="container">
+    <div class="row justify-content-center g-4">
+        {% for negocio in negocios %}
+            <div class="col-md-4 col-lg-3 tarjeta-sitio">
+                <div class="card h-100">
+                    {% if negocio.imagen_url %}
+                        <img src="{{ negocio.imagen_url }}" class="card-img-top">
+                    {% else %}
+                        <img src="{% static 'app_reservas/imagenes/Proximamente.png' %}" class="card-img-top">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ negocio.nombre }}</h5>
+                        <a href="{% url 'sitio_detalle' negocio.id %}" class="btn btn-primary">Entrar</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted text-center">Aún no hay sitios disponibles.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<section class="que-hacemos">
+    <h2>QUE HACEMOS</h2>
+    <div class="contenido">
+        <div class="item">
+            <h3>GESTIÓN DE RESERVAS</h3>
+            <p>Administramos reservas para distintos tipos de negocios y establecimientos.</p>
+        </div>
+        <div class="item">
+            <h3>PUBLICACIÓN DE SITIOS</h3>
+            <p>Permitimos que restaurantes y locales publiquen su información.</p>
+        </div>
+        <div class="item">
+            <h3>RESERVAS ONLINE</h3>
+            <p>Los clientes pueden reservar rápida y fácilmente.</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const buscador = document.getElementById("buscador");
+    buscador.addEventListener("keyup", function () {
+        const texto = buscador.value.toLowerCase();
+        document.querySelectorAll(".tarjeta-sitio").forEach(tarjeta => {
+            const nombre = tarjeta.querySelector(".card-title").textContent.toLowerCase();
+            tarjeta.style.display = nombre.includes(texto) ? "" : "none";
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}Confirmación de Reserva - CLICK&GO{% endblock %}
+{% block estilos %}
+    <link rel="stylesheet" href="{% static 'app_reservas/confirmacion.css' %}">
+{% endblock %}
+
+{% block contenido %}
+<main class="container py-5">
+
+    <div class="mb-4 text-start" style="max-width: 720px; margin-left: auto; margin-right: auto;">
+        <a href="{% url 'index' %}" class="btn-volver text-decoration-none">← VOLVER</a>
+    </div>
+
+    <section class="text-center mt-2">
+        <div class="checkmark-container">
+            <div class="checkmark-box"><span class="checkmark-icon">✓</span></div>
+        </div>
+
+        <p class="conf-title-small">Reserva Confirmada</p>
+        <h1 class="conf-title-large">¡TE ESPERAMOS, {{ reserva.nombre_cliente|title }}!</h1>
+        <p class="conf-subtitle">Hemos enviado la confirmación a "{{ reserva.email_cliente }}"</p>
+    </section>
+
+    <section class="details-card shadow-sm">
+        <div class="details-header">
+            <div>
+                <span class="label-reserva">Número de reserva</span>
+                <h2 class="id-reserva">{{ reserva.codigo_reserva }}</h2>
+            </div>
+            <div>
+                <span class="badge badge-confirmada">{{ reserva.estado }}</span>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <div class="info-label">Nombre</div>
+                <div class="info-value">{{ reserva.nombre_cliente }}</div>
+
+                <div class="info-label">Fecha</div>
+                <div class="info-value">{{ reserva.fecha|date:"d-m-Y" }}</div>
+
+                <div class="info-label">Comensales</div>
+                <div class="info-value">{{ reserva.comensales }} personas</div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="info-label">Teléfono</div>
+                <div class="info-value">{{ reserva.telefono_cliente }}</div>
+
+                <div class="info-label">Hora</div>
+                <div class="info-value">{{ reserva.hora }}</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="actions-row">
+        <a href="{% url 'nueva_reserva' reserva.negocio_id %}" class="btn-nueva-reserva">Nueva Reserva</a>
+        <a href="{% url 'index' %}" class="btn-volver-inicio">Volver al inicio</a>
+    </section>
+</main>
+{% endblock %}

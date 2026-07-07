@@ -1,0 +1,82 @@
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar{
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+}
+
+.navbar-brand img{
+    transition:0.3s;
+}
+
+.navbar-brand img:hover{
+    transform:scale(1.05);
+}
+
+/* Botón Iniciar Sesión */
+
+.navbar .btn{
+    border-radius:30px;
+    padding:8px 20px;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.navbar .btn:hover{
+    transform:scale(1.05);
+}
+.btn-volver {
+    color: #212529;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    transition: color 0.2s ease;
+}
+.btn-volver:hover { color: #FF914D; }
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
+    background:#212529;
+    color:white;
+    text-align:center;
+    padding:40px 20px;
+    margin-top:0;
+}
+
+.footer img{
+    margin-bottom:15px;
+    transition:0.3s;
+}
+
+.footer img:hover{
+    transform:scale(1.05);
+}
+
+.footer p{
+    margin:0;
+    font-size:0.95rem;
+    color:#dcdcdc;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    .navbar-brand img{
+        width:60px;
+        height:60px;
+    }
+
+    .footer{
+        padding:30px 15px;
+    }
+
+    .footer img{
+        width:60px;
+    }
+}
