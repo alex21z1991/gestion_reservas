@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Reserva - CLICK&GO</title>
+    <meta name="description" content="Detalle de confirmación de su reserva en CLICK&GO.">
+    <link rel="icon" type="image/png" href="imagenes/reserva.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="cssgeneral.css">
+    
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #212529;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .btn-volver {
+            color: #212529;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            transition: color 0.2s ease;
+        }
+
+        .btn-volver:hover {
+            color: #FF914D;
+        }
+
+        /* Checkmark icon box (gold/brownish border) */
+        .checkmark-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkmark-box {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #c59b6d;
+            background-color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkmark-icon {
+            color: #c59b6d;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        /* Títulos de confirmación */
+        .conf-title-small {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #8c8c8c;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .conf-title-large {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #000000;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .conf-subtitle {
+            font-size: 0.95rem;
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Tarjeta de detalles con bordes negros y rectos */
+        .details-card {
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            border-radius: 0 !important;
+            padding: 2.5rem;
+            max-width: 720px;
+            margin: 0 auto 3rem auto;
+        }
+
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .label-reserva {
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .id-reserva {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #000000;
+            margin: 0.25rem 0 0 0;
+            line-height: 1.1;
+        }
+
+        /* Badge de confirmada en verde */
+        .badge-confirmada {
+            background-color: #d1f7d6 !important;
+            color: #1f782c !important;
+            border: 1px solid #1f782c !important;
+            border-radius: 0 !important;
+            padding: 0.45rem 1.25rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Grid de información */
+        .info-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Botones de acción inferiores */
+        .actions-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .btn-nueva-reserva {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+            border: 1px solid #000000 !important;
+            border-radius: 0 !important;
+            padding: 0.85rem 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            min-width: 220px;
+            text-align: center;
+        }
+
+        .btn-nueva-reserva:hover {
+            background-color: #000000 !important;
+            color: #FFFFFF !important;
+            transform: translateY(-2px);
+        }
+
+        .btn-volver-inicio {
+            background-color: #8B2522 !important;
+            color: #FFFFFF !important;
+            border: 1px solid #8B2522 !important;
+            border-radius: 0 !important;
+            padding: 0.85rem 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            min-width: 220px;
+            text-align: center;
+        }
+
+        .btn-volver-inicio:hover {
+            background-color: #6d1d1b !important;
+            border-color: #6d1d1b !important;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 575.98px) {
+            .details-card {
+                padding: 1.5rem;
+            }
+            .actions-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            .btn-nueva-reserva, .btn-volver-inicio {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <a href="index.html" class="navbar-brand">
+            <img src="imagenes/image__1_-removebg-preview.png"
+                 width="80"
+                 height="80"
+                 alt="ClickyGo">
+        </a>
+        
+        <!-- Botones navbar de la captura -->
+        <div class="d-flex gap-2">
+            <a href="reservas.html" class="btn btn-dark fw-bold" style="background-color: #000000; border-radius: 6px; border: none; font-size: 0.9rem; padding: 0.5rem 1.2rem;">Reservas</a>
+            <a href="administracion.html" class="btn text-white fw-bold" style="background-color: #FF914D; border-radius: 6px; border: none; font-size: 0.9rem; padding: 0.5rem 1.2rem;">Admin</a>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="container py-5">
+    
+    <!-- Enlace de retorno -->
+    <div class="mb-4 text-start" style="max-width: 720px; margin-left: auto; margin-right: auto;">
+        <a href="reservas.html" id="btn-volver" class="btn-volver text-decoration-none">← VOLVER</a>
+    </div>
+
+    <!-- Sección de Confirmación (Checkmark + Textos) -->
+    <section class="text-center mt-2">
+        <div class="checkmark-container">
+            <div class="checkmark-box">
+                <span class="checkmark-icon">✓</span>
+            </div>
+        </div>
+        
+        <p class="conf-title-small">Reserva Confirmada</p>
+        <h1 class="conf-title-large" id="welcome-message">¡TE ESPERAMOS, (nombre)!</h1>
+        <p class="conf-subtitle" id="welcome-email">Hemos enviado la confirmación a example@email.com</p>
+    </section>
+
+    <!-- Tarjeta de Detalles de la Reserva -->
+    <section class="details-card shadow-sm">
+        <div class="details-header">
+            <div>
+                <span class="label-reserva">Número de reserva</span>
+                <h2 class="id-reserva" id="card-id">RRS-821</h2>
+            </div>
+            <div>
+                <span class="badge badge-confirmada">Confirmada</span>
+            </div>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-sm-6">
+                <div class="info-label">Nombre</div>
+                <div class="info-value" id="card-nombre">Nombre Completo</div>
+                
+                <div class="info-label">Fecha</div>
+                <div class="info-value" id="card-fecha">DD-MM-AAAA</div>
+                
+                <div class="info-label">Comensales</div>
+                <div class="info-value" id="card-comensales">2 Personas</div>
+            </div>
+            
+            <div class="col-sm-6">
+                <div class="info-label">Teléfono</div>
+                <div class="info-value" id="card-telefono">+56 9 XXXX XXXX</div>
+                
+                <div class="info-label">Hora</div>
+                <div class="info-value" id="card-hora">00:00</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Botones de Acción -->
+    <section class="actions-row">
+        <a href="reservas.html" class="btn-nueva-reserva">Nueva Reserva</a>
+        <a href="index.html" class="btn-volver-inicio">Volver al inicio</a>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer mt-5">
+    <img src="imagenes/image__1_-removebg-preview.png" width="80" alt="ClickyGo">
+    <p class="mt-3">
+        © 2026 ClickyGo - Plataforma de reservas online
+    </p>
+</footer>
+
+<!-- Script de Carga Dinámica -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Valores Mock por defecto para mostrar en caso de no encontrar datos reales
+        let nombreCompleto = 'Nombre Completo';
+        let primerNombre = 'Nombre';
+        let correo = 'example@email.com';
+        let telefono = '+56 9 XXXX XXXX';
+        let fecha = 'DD-MM-AAAA';
+        let hora = '00:00';
+        let comensales = '2 Personas';
+        let codReserva = 'RRS-821';
+
+        // Intentar leer parámetros de URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const reservaId = urlParams.get('id');
+
+        if (reservaId) {
+            // Leer desde localStorage
+            const reservas = JSON.parse(localStorage.getItem('clickgo_reservas')) || [];
+            const reserva = reservas.find(res => res.id === reservaId);
+
+            if (reserva) {
+                nombreCompleto = reserva.nombre;
+                
+                // Extraer el primer nombre y capitalizarlo
+                const nombres = reserva.nombre.trim().split(' ');
+                if (nombres.length > 0) {
+                    primerNombre = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1).toLowerCase();
+                }
+                
+                correo = reserva.email;
+                telefono = reserva.telefono;
+                
+                // Formatear Fecha (de YYYY-MM-DD a DD-MM-YYYY)
+                const partesFecha = reserva.fecha.split('-');
+                if (partesFecha.length === 3) {
+                    fecha = `${partesFecha[2]}-${partesFecha[1]}-${partesFecha[0]}`;
+                } else {
+                    fecha = reserva.fecha;
+                }
+
+                hora = reserva.hora;
+                comensales = reserva.comensales;
+                
+                // Generar un código estético corto tipo RRS-821 a partir del timestamp
+                // Usamos los últimos 3 dígitos del timestamp del ID
+                const timestampStr = reserva.id.replace('RES-', '');
+                const ultimosDigitos = timestampStr.substring(timestampStr.length - 3);
+                codReserva = `RRS-${ultimosDigitos}`;
+            }
+        }
+
+        // Poblar Elementos en el DOM
+        document.getElementById('welcome-message').textContent = `¡TE ESPERAMOS, ${primerNombre}!`;
+        document.getElementById('welcome-email').textContent = `Hemos enviado la confirmación a "${correo}"`;
+        
+        document.getElementById('card-id').textContent = codReserva;
+        document.getElementById('card-nombre').textContent = nombreCompleto;
+        document.getElementById('card-telefono').textContent = telefono;
+        document.getElementById('card-fecha').textContent = fecha;
+        document.getElementById('card-hora').textContent = hora;
+        
+        // Formatear Comensales para asegurar la mayúscula de la captura
+        const comensalesCapitalizado = comensales.charAt(0).toUpperCase() + comensales.slice(1);
+        document.getElementById('card-comensales').textContent = comensalesCapitalizado;
+    });
+</script>
+</body>
+</html>
