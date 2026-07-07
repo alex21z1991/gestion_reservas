@@ -5,7 +5,7 @@ from datetime import date, timedelta
 
 from django import forms
 
-from .models import Reserva, Usuario
+from .models import Reserva, Usuario, Negocio, Servicio, HorarioAtencion
 
 
 class ReservaForm(forms.ModelForm):
@@ -131,3 +131,41 @@ class RegistroForm(forms.ModelForm):
         if commit:
             usuario.save()
         return usuario
+
+
+class NegocioForm(forms.ModelForm):
+    class Meta:
+        model = Negocio
+        fields = ["nombre", "descripcion", "direccion", "telefono", "email_contacto", "activo"]
+        widgets = {
+            "nombre": forms.TextInput(attrs={"class": "form-control"}),
+            "descripcion": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "direccion": forms.TextInput(attrs={"class": "form-control"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control"}),
+            "email_contacto": forms.EmailInput(attrs={"class": "form-control"}),
+            "activo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+
+class ServicioForm(forms.ModelForm):
+    class Meta:
+        model = Servicio
+        fields = ["nombre", "descripcion", "precio", "activo"]
+        widgets = {
+            "nombre": forms.TextInput(attrs={"class": "form-control"}),
+            "descripcion": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+            "precio": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+            "activo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+
+class HorarioAtencionForm(forms.ModelForm):
+    class Meta:
+        model = HorarioAtencion
+        fields = ["dia_semana", "hora_apertura", "hora_cierre", "activo"]
+        widgets = {
+            "dia_semana": forms.Select(attrs={"class": "form-select"}),
+            "hora_apertura": forms.TimeInput(attrs={"class": "form-control", "type": "time"}),
+            "hora_cierre": forms.TimeInput(attrs={"class": "form-control", "type": "time"}),
+            "activo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }

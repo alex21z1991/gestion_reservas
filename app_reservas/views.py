@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import LoginForm, RegistroForm, ReservaForm
-from .models import HorarioDisponible, Negocio, Reserva
+from .forms import LoginForm, RegistroForm, ReservaForm, NegocioForm, ServicioForm, HorarioAtencionForm
+from .models import HorarioDisponible, Negocio, Reserva, Servicio, HorarioAtencion
 from .permisos import solo_administrador
 
 HORAS_BASE = ["13:00", "14:00", "15:00", "16:00", "17:00"]
@@ -88,6 +88,43 @@ def confirmacion_reserva(request, codigo):
 def panel_admin(request, negocio_id):
     negocio = get_object_or_404(Negocio, id=negocio_id)
     reservas = negocio.reservas.order_by("fecha", "hora")
+    
+    negocio_form = NegocioForm(instance=negocio)
+    servicio_form = ServicioForm()
+    horario_form = HorarioAtencionForm()
+    
+    active_tab = request.GET.get("tab", "reservas")
+    
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "edit_negocio":
+            negocio_form = NegocioForm(request.POST, request.FILES, instance=negocio)
+            if negocio_form.is_valid():
+                negocio_form.save()
+                messages.success(request, "Información del local actualizada con éxito.")
+                return redirect(f"/admin-reservas/{negocio_id}/?tab=info")
+        elif action == "add_servicio":
+            servicio_form = ServicioForm(request.POST)
+            if servicio_form.is_valid():
+                servicio = servicio_form.save(commit=False)
+                servicio.negocio = negocio
+                servicio.save()
+                messages.success(request, "Servicio agregado con éxito.")
+                return redirect(f"/admin-reservas/{negocio_id}/?tab=servicios")
+        elif action == "add_horario":
+            horario_form = HorarioAtencionForm(request.POST)
+            if horario_form.is_valid():
+                try:
+                    horario = horario_form.save(commit=False)
+                    horario.negocio = negocio
+                    horario.save()
+                    messages.success(request, "Horario de atención agregado con éxito.")
+                except Exception as e:
+                    messages.error(request, "Este día de la semana ya tiene un horario configurado.")
+                return redirect(f"/admin-reservas/{negocio_id}/?tab=horarios")
+
+    servicios = negocio.servicios.all()
+    horarios = negocio.horarios_atencion.all().order_by("dia_semana")
 
     contexto = {
         "negocio": negocio,
@@ -95,8 +132,36 @@ def panel_admin(request, negocio_id):
         "total": reservas.count(),
         "confirmadas": reservas.filter(estado=Reserva.Estado.CONFIRMADA).count(),
         "canceladas": reservas.filter(estado=Reserva.Estado.CANCELADA).count(),
+        "negocio_form": negocio_form,
+        "servicio_form": servicio_form,
+        "horario_form": horario_form,
+        "servicios": servicios,
+        "horarios": horarios,
+        "active_tab": active_tab,
     }
     return render(request, "app_reservas/administracion.html", contexto)
+
+
+@solo_administrador
+def eliminar_servicio(request, servicio_id):
+    if request.method == "POST":
+        servicio = get_object_or_404(Servicio, id=servicio_id)
+        negocio_id = servicio.negocio_id
+        servicio.delete()
+        messages.success(request, "Servicio eliminado con éxito.")
+        return redirect(f"/admin-reservas/{negocio_id}/?tab=servicios")
+    return redirect("index")
+
+
+@solo_administrador
+def eliminar_horario(request, horario_id):
+    if request.method == "POST":
+        horario = get_object_or_404(HorarioAtencion, id=horario_id)
+        negocio_id = horario.negocio_id
+        horario.delete()
+        messages.success(request, "Horario de atención eliminado con éxito.")
+        return redirect(f"/admin-reservas/{negocio_id}/?tab=horarios")
+    return redirect("index")
 
 
 @login_required
