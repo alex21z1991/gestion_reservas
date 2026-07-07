@@ -25,8 +25,8 @@
         {% for negocio in negocios %}
             <div class="col-md-4 col-lg-3 tarjeta-sitio">
                 <div class="card h-100">
-                    {% if negocio.imagen_url %}
-                        <img src="{{ negocio.imagen_url }}" class="card-img-top">
+                    {% if negocio.imagen_miniatura %}
+                        <img src="{{ negocio.imagen_miniatura.url }}" class="card-img-top">
                     {% else %}
                         <img src="{% static 'app_reservas/imagenes/Proximamente.png' %}" class="card-img-top">
                     {% endif %}

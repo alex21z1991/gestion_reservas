@@ -15,7 +15,11 @@
     <div class="row g-4">
         <section class="col-lg-8">
             <div class="mb-4">
-                <img src="{% static 'app_reservas/imagenes/fachada.jpg' %}" class="restaurant-hero-img img-fluid shadow-sm" alt="Fachada">
+                {% if negocio.imagen_hero %}
+                    <img src="{{ negocio.imagen_hero.url }}" class="restaurant-hero-img img-fluid shadow-sm" alt="Fachada">
+                {% else %}
+                    <img src="{% static 'app_reservas/imagenes/Proximamente.png' %}" class="restaurant-hero-img img-fluid shadow-sm" alt="Próximamente">
+                {% endif %}
             </div>
 
             <div class="custom-card shadow-sm mb-4">
