@@ -19,4 +19,5 @@ urlpatterns = [
     path("cuenta/login/", views.login_view, name="login"),
     path("cuenta/registro/", views.registro_view, name="registro"),
     path("cuenta/logout/", views.logout_view, name="logout"),
+    path("cuenta/mis-reservas/", views.mis_reservas, name="mis_reservas"),
 ]

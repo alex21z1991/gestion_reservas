@@ -171,6 +171,11 @@ def cancelar_reserva(request, reserva_id):
 
     reserva = get_object_or_404(Reserva, id=reserva_id)
 
+    # Validar que el usuario sea el dueño de la reserva o un administrador
+    if not (request.user.is_administrador or reserva.usuario == request.user):
+        messages.error(request, "No tienes permiso para cancelar esta reserva.")
+        return redirect("index")
+
     if reserva.estado == Reserva.Estado.CONFIRMADA:
         reserva.cancelar()
         # Libera el cupo ocupado
@@ -183,7 +188,28 @@ def cancelar_reserva(request, reserva_id):
 
         messages.success(request, "La reserva fue cancelada y el horario quedó liberado.")
 
-    return redirect("panel_admin", negocio_id=reserva.negocio_id)
+    if request.user.is_administrador:
+        return redirect("panel_admin", negocio_id=reserva.negocio_id)
+    else:
+        return redirect("mis_reservas")
+
+
+@login_required
+def mis_reservas(request):
+    """Muestra el historial de reservas del cliente autenticado."""
+    reservas = request.user.reservas.order_by("-fecha", "-hora")
+    
+    total_reservas = reservas.count()
+    activas = reservas.filter(estado=Reserva.Estado.CONFIRMADA).count()
+    canceladas = reservas.filter(estado=Reserva.Estado.CANCELADA).count()
+
+    contexto = {
+        "reservas": reservas,
+        "total_reservas": total_reservas,
+        "activas": activas,
+        "canceladas": canceladas,
+    }
+    return render(request, "app_reservas/mis_reservas.html", contexto)
 
 
 # =====================================================================
