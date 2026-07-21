@@ -22,6 +22,9 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
+from datetime import timedelta
+from django.utils import timezone
+
 
 # =====================================================================
 #  USUARIOS Y ROLES (cliente / administrador / dueño)
@@ -244,6 +247,12 @@ class Reserva(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
+    # Seguimiento del correo de confirmación enviado por Celery
+    # (ver app_reservas/tasks.py -> enviar_correo_confirmacion_reserva)
+    correo_enviado = models.BooleanField(default=False)
+    correo_enviado_fecha = models.DateTimeField(null=True, blank=True)
+    correo_error = models.TextField(null=True, blank=True)
+
     class Meta:
         db_table = "reservas"
         managed = True
@@ -267,3 +276,31 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"{self.codigo_reserva} - {self.nombre_cliente} ({self.estado})"
+    
+class ReservaTemporal(models.Model):
+    negocio = models.ForeignKey(
+        "Negocio",
+        on_delete=models.CASCADE
+    )
+
+    fecha = models.DateField()
+
+    hora = models.TimeField()
+
+    usuario_sesion = models.CharField(
+        max_length=100
+    )
+
+    creado = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def esta_activa(self):
+        limite = self.creado + timedelta(minutes=5)
+        return timezone.now() < limite
+
+    def __str__(self):
+        return f"{self.negocio.nombre} - {self.fecha} {self.hora}"
+
+    class Meta:
+        db_table = "app_reservas_reservatemporal"

@@ -58,7 +58,13 @@ class HorarioDisponibleAdmin(admin.ModelAdmin):
 
 @admin.register(Reserva)
 class ReservaAdmin(admin.ModelAdmin):
-    list_display = ("codigo_reserva", "nombre_cliente", "negocio", "fecha", "hora", "estado")
-    list_filter = ("estado", "negocio", "fecha")
+    list_display = (
+        "codigo_reserva", "nombre_cliente", "negocio", "fecha", "hora",
+        "estado", "correo_enviado",
+    )
+    list_filter = ("estado", "negocio", "fecha", "correo_enviado")
     search_fields = ("codigo_reserva", "nombre_cliente", "email_cliente")
-    readonly_fields = ("codigo_reserva", "fecha_creacion", "fecha_actualizacion")
+    readonly_fields = (
+        "codigo_reserva", "fecha_creacion", "fecha_actualizacion",
+        "correo_enviado", "correo_enviado_fecha", "correo_error",
+    )

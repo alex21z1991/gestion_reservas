@@ -20,4 +20,7 @@ urlpatterns = [
     path("cuenta/registro/", views.registro_view, name="registro"),
     path("cuenta/logout/", views.logout_view, name="logout"),
     path("cuenta/mis-reservas/", views.mis_reservas, name="mis_reservas"),
+
+    path("bloquear-mesa/", views.bloquear_mesa, name="bloquear_mesa"),
+    path("horarios-disponibles/", views.horarios_disponibles, name="horarios_disponibles"),
 ]

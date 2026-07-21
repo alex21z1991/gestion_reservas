@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reserva confirmada</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f4f4; font-family: Arial, Helvetica, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4; padding: 30px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border:1px solid #000000;">
+
+                    <tr>
+                        <td style="background-color:#000000; color:#ffffff; padding: 24px; text-align:center;">
+                            <span style="font-size:22px; font-weight:800; letter-spacing:0.05em;">CLICK&amp;GO</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size:13px; color:#6c757d; text-transform:uppercase; margin:0 0 4px 0;">Reserva confirmada</p>
+                            <h1 style="font-size:22px; margin:0 0 20px 0; color:#000000;">¡Te esperamos, {{ reserva.nombre_cliente }}!</h1>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #000000; margin-bottom: 20px;">
+                                <tr>
+                                    <td style="padding:16px; border-bottom:1px solid #e0e0e0;">
+                                        <span style="font-size:12px; color:#6c757d; text-transform:uppercase;">Código de reserva</span><br>
+                                        <strong style="font-size:18px;">{{ reserva.codigo_reserva }}</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:16px; border-bottom:1px solid #e0e0e0;">
+                                        <span style="font-size:12px; color:#6c757d; text-transform:uppercase;">Local</span><br>
+                                        <strong>{{ reserva.negocio.nombre }}</strong>
+                                        {% if reserva.negocio.direccion %}<br><span style="color:#6c757d; font-size:14px;">{{ reserva.negocio.direccion }}</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:16px; border-bottom:1px solid #e0e0e0;">
+                                        <span style="font-size:12px; color:#6c757d; text-transform:uppercase;">Fecha y hora</span><br>
+                                        <strong>{{ reserva.fecha|date:"d-m-Y" }} · {{ reserva.hora }}</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:16px; {% if reserva.notas %}border-bottom:1px solid #e0e0e0;{% endif %}">
+                                        <span style="font-size:12px; color:#6c757d; text-transform:uppercase;">Comensales</span><br>
+                                        <strong>{{ reserva.comensales }} persona{{ reserva.comensales|pluralize }}</strong>
+                                        {% if reserva.ocasion and reserva.ocasion != "Ninguna" %}
+                                            &nbsp;·&nbsp; {{ reserva.ocasion }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if reserva.notas %}
+                                <tr>
+                                    <td style="padding:16px;">
+                                        <span style="font-size:12px; color:#6c757d; text-transform:uppercase;">Notas</span><br>
+                                        <span style="font-size:14px;">{{ reserva.notas }}</span>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </table>
+
+                            <p style="font-size:13px; color:#6c757d; margin:0;">
+                                Si necesitas cancelar tu reserva, puedes hacerlo desde la sección
+                                "Mis Reservas" en tu cuenta de ClickyGo.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="background-color:#212529; color:#dcdcdc; text-align:center; padding:20px; font-size:12px;">
+                            © 2026 ClickyGo — Plataforma de reservas online
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

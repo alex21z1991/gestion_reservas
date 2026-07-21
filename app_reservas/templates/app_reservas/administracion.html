@@ -1,101 +1,405 @@
 {% extends "base.html" %}
 {% load static %}
-{% block titulo %}Administración de Reservas - CLICK&GO{% endblock %}
+{% block titulo %}Administración - CLICK&GO{% endblock %}
 {% block estilos %}
     <link rel="stylesheet" href="{% static 'app_reservas/administracion_css.css' %}">
+    <style>
+        /* Estilos complementarios para el panel de administración */
+        .nav-tabs .nav-link {
+            color: #212529;
+            font-weight: 600;
+            border-radius: 0;
+            border: 1px solid transparent;
+        }
+        .nav-tabs .nav-link.active {
+            color: #FF914D;
+            border-color: #000000 #000000 #fff;
+            border-bottom: 2px solid #fff;
+            font-weight: 700;
+        }
+        .nav-tabs {
+            border-bottom: 1px solid #000000;
+        }
+        .form-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .form-control, .form-select {
+            border: 1px solid #000000;
+            border-radius: 0;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #FF914D;
+            box-shadow: none;
+        }
+        .btn-custom-action {
+            background-color: #000000;
+            color: #ffffff;
+            border-radius: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #000000;
+            transition: all 0.2s ease;
+        }
+        .btn-custom-action:hover {
+            background-color: #FF914D;
+            border-color: #FF914D;
+            color: #ffffff;
+        }
+        .btn-custom-delete {
+            background-color: #8B2522;
+            color: #ffffff;
+            border-radius: 0;
+            font-weight: 700;
+            font-size: 0.8rem;
+            border: 1px solid #8B2522;
+        }
+        .btn-custom-delete:hover {
+            background-color: #6d1d1b;
+            color: #ffffff;
+        }
+    </style>
 {% endblock %}
 
 {% block contenido %}
 <main class="container py-5">
 
     <div class="mb-4">
-        <a href="{% url 'sitio_detalle' negocio.id %}" class="btn-volver text-decoration-none">← VOLVER AL SITIO</a>
+        <a href="{% url 'index' %}" class="btn-volver text-decoration-none">← VOLVER AL INICIO</a>
     </div>
 
     <header class="mb-5">
-        <span class="text-accent text-uppercase fw-bold d-block mb-1" style="letter-spacing: 0.05em; font-size: 0.9rem;">Administración</span>
-        <h1 class="display-4 fw-black text-dark mb-2" style="font-weight: 800;">Registro de Reservas - {{ negocio.nombre }}</h1>
-        <p class="lead text-muted m-0">Visualice y gestione la disponibilidad de la sede en tiempo real.</p>
+        <span class="text-accent text-uppercase fw-bold d-block mb-1" style="letter-spacing: 0.05em; font-size: 0.9rem;">Administración de Local</span>
+        <h1 class="display-4 fw-black text-dark mb-2" style="font-weight: 800;">Panel de Control - {{ negocio.nombre }}</h1>
+        <p class="lead text-muted m-0">Administra las reservas, servicios, horarios y detalles del local directamente en la página.</p>
     </header>
 
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
-            <div class="custom-card shadow-sm text-center">
-                <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Total de Reservas</h3>
-                <div class="stat-val">{{ total }}</div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="custom-card shadow-sm text-center" style="border-left: 4px solid #198754;">
-                <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Confirmadas</h3>
-                <div class="stat-val text-success">{{ confirmadas }}</div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="custom-card shadow-sm text-center" style="border-left: 4px solid #dc3545;">
-                <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Canceladas</h3>
-                <div class="stat-val text-danger">{{ canceladas }}</div>
-            </div>
-        </div>
-    </div>
+    <!-- Pestañas de Navegación del Panel -->
+    <ul class="nav nav-tabs mb-4" id="adminTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if active_tab == 'reservas' %}active{% endif %}" id="reservas-tab" data-bs-toggle="tab" data-bs-target="#reservas-pane" type="button" role="tab" aria-controls="reservas-pane" aria-selected="{% if active_tab == 'reservas' %}true{% else %}false{% endif %}">
+                📅 RESERVAS
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if active_tab == 'servicios' %}active{% endif %}" id="servicios-tab" data-bs-toggle="tab" data-bs-target="#servicios-pane" type="button" role="tab" aria-controls="servicios-pane" aria-selected="{% if active_tab == 'servicios' %}true{% else %}false{% endif %}">
+                🍽️ SERVICIOS
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if active_tab == 'horarios' %}active{% endif %}" id="horarios-tab" data-bs-toggle="tab" data-bs-target="#horarios-pane" type="button" role="tab" aria-controls="horarios-pane" aria-selected="{% if active_tab == 'horarios' %}true{% else %}false{% endif %}">
+                ⏰ HORARIOS
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if active_tab == 'info' %}active{% endif %}" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-pane" type="button" role="tab" aria-controls="info-pane" aria-selected="{% if active_tab == 'info' %}true{% else %}false{% endif %}">
+                ⚙️ INFORMACIÓN
+            </button>
+        </li>
+    </ul>
 
-    <div class="custom-card shadow-sm p-0 overflow-hidden">
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Cliente</th>
-                        <th>Fecha y Hora</th>
-                        <th>Comensales</th>
-                        <th>Ocasión / Notas</th>
-                        <th>Estado</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in reservas %}
-                    <tr>
-                        <td class="fw-bold text-muted">{{ r.codigo_reserva }}</td>
-                        <td>
-                            <div class="fw-bold text-dark">{{ r.nombre_cliente }}</div>
-                            <div class="small text-muted">{{ r.email_cliente }}</div>
-                            <div class="small text-muted">{{ r.telefono_cliente }}</div>
-                        </td>
-                        <td>
-                            <div class="fw-bold">{{ r.fecha|date:"d-m-Y" }}</div>
-                            <div class="badge bg-dark">{{ r.hora }}</div>
-                        </td>
-                        <td class="fw-semibold">{{ r.comensales }}</td>
-                        <td>
-                            <div class="fw-bold text-accent" style="font-size: 0.85rem;">{{ r.ocasion }}</div>
-                            <div class="small text-muted text-truncate" style="max-width: 200px;" title="{{ r.notas|default:'Ninguna' }}">
-                                {{ r.notas|default:"Sin notas" }}
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge badge-estado {% if r.estado == 'Confirmada' %}badge-confirmada{% else %}badge-cancelada{% endif %}">
-                                {{ r.estado }}
-                            </span>
-                        </td>
-                        <td>
-                            {% if r.estado == 'Confirmada' %}
-                            <form method="post" action="{% url 'cancelar_reserva' r.id %}"
-                                  onsubmit="return confirm('¿Está seguro de que desea cancelar esta reserva?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-cancelar btn-action btn-sm">Cancelar</button>
-                            </form>
-                            {% else %}
-                                <span class="text-muted small">-</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="7" class="text-center text-muted py-5">No se encontraron registros de reservas para esta sede.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Contenido de las Pestañas -->
+    <div class="tab-content" id="adminTabContent">
+        
+        <!-- Pestaña 1: Reservas -->
+        <div class="tab-pane fade {% if active_tab == 'reservas' %}show active{% endif %}" id="reservas-pane" role="tabpanel" aria-labelledby="reservas-tab" tabindex="0">
+            <!-- Estadísticas rápidas -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="custom-card shadow-sm text-center">
+                        <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Total de Reservas</h3>
+                        <div class="stat-val">{{ total }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card shadow-sm text-center" style="border-left: 4px solid #198754;">
+                        <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Confirmadas</h3>
+                        <div class="stat-val text-success">{{ confirmadas }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card shadow-sm text-center" style="border-left: 4px solid #dc3545;">
+                        <h3 class="fs-6 text-muted text-uppercase fw-bold mb-2">Canceladas</h3>
+                        <div class="stat-val text-danger">{{ canceladas }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Reservas -->
+            <div class="custom-card shadow-sm p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Fecha y Hora</th>
+                                <th>Comensales</th>
+                                <th>Ocasión / Notas</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in reservas %}
+                            <tr>
+                                <td class="fw-bold text-muted">{{ r.codigo_reserva }}</td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ r.nombre_cliente }}</div>
+                                    <div class="small text-muted">{{ r.email_cliente }}</div>
+                                    <div class="small text-muted">{{ r.telefono_cliente }}</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">{{ r.fecha|date:"d-m-Y" }}</div>
+                                    <div class="badge bg-dark">{{ r.hora }}</div>
+                                </td>
+                                <td class="fw-semibold">{{ r.comensales }}</td>
+                                <td>
+                                    <div class="fw-bold text-accent" style="font-size: 0.85rem;">{{ r.ocasion }}</div>
+                                    <div class="small text-muted text-truncate" style="max-width: 200px;" title="{{ r.notas|default:'Ninguna' }}">
+                                        {{ r.notas|default:"Sin notas" }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-estado {% if r.estado == 'Confirmada' %}badge-confirmada{% else %}badge-cancelada{% endif %}">
+                                        {{ r.estado }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if r.estado == 'Confirmada' %}
+                                    <form method="post" action="{% url 'cancelar_reserva' r.id %}"
+                                          onsubmit="return confirm('¿Está seguro de que desea cancelar esta reserva?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-cancelar btn-action btn-sm">Cancelar</button>
+                                    </form>
+                                    {% else %}
+                                        <span class="text-muted small">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="7" class="text-center text-muted py-5">No se encontraron registros de reservas para esta sede.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+
+        <!-- Pestaña 2: Servicios -->
+        <div class="tab-pane fade {% if active_tab == 'servicios' %}show active{% endif %}" id="servicios-pane" role="tabpanel" aria-labelledby="servicios-tab" tabindex="0">
+            <div class="row g-4">
+                <!-- Columna 1: Formulario Agregar -->
+                <div class="col-lg-5">
+                    <div class="custom-card shadow-sm">
+                        <h2 class="h5 fw-bold mb-4 text-dark text-uppercase border-bottom pb-2">Agregar Nuevo Servicio</h2>
+                        <form method="post" action="?tab=servicios">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_servicio">
+                            
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Nombre del Servicio</label>
+                                {{ servicio_form.nombre }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Descripción</label>
+                                {{ servicio_form.descripcion }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Precio ($)</label>
+                                {{ servicio_form.precio }}
+                            </div>
+                            <div class="mb-3 form-check">
+                                {{ servicio_form.activo }}
+                                <label class="form-check-label text-dark fw-bold">Servicio Activo</label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-custom-action w-100 mt-2">Agregar Servicio</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Columna 2: Lista de Servicios -->
+                <div class="col-lg-7">
+                    <div class="custom-card shadow-sm p-0 overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Servicio</th>
+                                        <th>Precio</th>
+                                        <th>Estado</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for s in servicios %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ s.nombre }}</div>
+                                            <div class="small text-muted">{{ s.descripcion|default:"Sin descripción." }}</div>
+                                        </td>
+                                        <td class="fw-bold">${{ s.precio|floatformat:0 }}</td>
+                                        <td>
+                                            {% if s.activo %}
+                                                <span class="badge bg-success text-uppercase fw-bold" style="border-radius:0;">Activo</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary text-uppercase fw-bold" style="border-radius:0;">Inactivo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <form method="post" action="{% url 'eliminar_servicio' s.id %}" onsubmit="return confirm('¿Está seguro de que desea eliminar este servicio?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-custom-delete btn-sm btn-action">Eliminar</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="4" class="text-center text-muted py-5">No hay servicios registrados para este local.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña 3: Horarios de Atención -->
+        <div class="tab-pane fade {% if active_tab == 'horarios' %}show active{% endif %}" id="horarios-pane" role="tabpanel" aria-labelledby="horarios-tab" tabindex="0">
+            <div class="row g-4">
+                <!-- Columna 1: Formulario Agregar Horario -->
+                <div class="col-lg-5">
+                    <div class="custom-card shadow-sm">
+                        <h2 class="h5 fw-bold mb-4 text-dark text-uppercase border-bottom pb-2">Agregar Día de Atención</h2>
+                        <form method="post" action="?tab=horarios">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_horario">
+                            
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Día de la Semana</label>
+                                {{ horario_form.dia_semana }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Hora de Apertura</label>
+                                {{ horario_form.hora_apertura }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Hora de Cierre</label>
+                                {{ horario_form.hora_cierre }}
+                            </div>
+                            <div class="mb-3 form-check">
+                                {{ horario_form.activo }}
+                                <label class="form-check-label text-dark fw-bold">Horario Activo</label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-custom-action w-100 mt-2">Agregar Horario</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Columna 2: Lista de Horarios -->
+                <div class="col-lg-7">
+                    <div class="custom-card shadow-sm p-0 overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Día</th>
+                                        <th>Apertura</th>
+                                        <th>Cierre</th>
+                                        <th>Estado</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for h in horarios %}
+                                    <tr>
+                                        <td class="fw-bold text-dark">{{ h.get_dia_semana_display }}</td>
+                                        <td class="fw-bold">{{ h.hora_apertura|time:"H:i" }}</td>
+                                        <td class="fw-bold">{{ h.hora_cierre|time:"H:i" }}</td>
+                                        <td>
+                                            {% if h.activo %}
+                                                <span class="badge bg-success text-uppercase fw-bold" style="border-radius:0;">Activo</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary text-uppercase fw-bold" style="border-radius:0;">Inactivo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <form method="post" action="{% url 'eliminar_horario' h.id %}" onsubmit="return confirm('¿Está seguro de que desea eliminar este horario de atención?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-custom-delete btn-sm btn-action">Eliminar</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="5" class="text-center text-muted py-5">No hay horarios de atención configurados para este local.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña 4: Información del Local -->
+        <div class="tab-pane fade {% if active_tab == 'info' %}show active{% endif %}" id="info-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+            <div class="custom-card shadow-sm">
+                <h2 class="h5 fw-bold mb-4 text-dark text-uppercase border-bottom pb-2">Editar Datos de la Sede</h2>
+                <form method="post" enctype="multipart/form-data" action="?tab=info">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit_negocio">
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Nombre del Establecimiento</label>
+                                {{ negocio_form.nombre }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Teléfono de Contacto</label>
+                                {{ negocio_form.telefono }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Dirección Física</label>
+                                {{ negocio_form.direccion }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Email de Contacto</label>
+                                {{ negocio_form.email_contacto }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Descripción</label>
+                                {{ negocio_form.descripcion }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3 form-check">
+                                {{ negocio_form.activo }}
+                                <label class="form-check-label text-dark fw-bold">Establecimiento Activo (Visible en el buscador)</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 border-top pt-3">
+                        <button type="submit" class="btn btn-custom-action btn-lg px-5">Guardar Cambios del Local</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
 </main>
 {% endblock %}

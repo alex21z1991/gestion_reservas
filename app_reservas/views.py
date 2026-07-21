@@ -1,14 +1,27 @@
 # app_reservas/views.py
 
+from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 
+from datetime import datetime, timedelta
+from django.utils import timezone
+import uuid
+
 from .forms import LoginForm, RegistroForm, ReservaForm, NegocioForm, ServicioForm, HorarioAtencionForm
-from .models import HorarioDisponible, Negocio, Reserva, Servicio, HorarioAtencion
+from .models import (
+    HorarioDisponible,
+    Negocio,
+    Reserva,
+    Servicio,
+    HorarioAtencion,
+    ReservaTemporal,
+)
 from .permisos import solo_administrador
+from .tasks import enviar_correo_confirmacion_reserva
 
 HORAS_BASE = ["13:00", "14:00", "15:00", "16:00", "17:00"]
 
@@ -37,42 +50,160 @@ def sitio_detalle(request, negocio_id):
 #  RESERVAS (reservas.html -> confir_reservas.html)
 # =====================================================================
 
+# ============================================================
+# NUEVA RESERVA
+# ============================================================
+
 def nueva_reserva(request, negocio_id):
-    negocio = get_object_or_404(Negocio, id=negocio_id, activo=True)
+    negocio = get_object_or_404(
+        Negocio,
+        id=negocio_id,
+        activo=True
+    )
+    # eliminar bloqueos vencidos
+    limite = timezone.now() - timedelta(minutes=5)
+    ReservaTemporal.objects.filter(
+        creado__lt=limite
+    ).delete()
+
+    fecha = None
 
     if request.method == "POST":
-        form = ReservaForm(request.POST, horas_disponibles=HORAS_BASE)
-        if form.is_valid():
-            hora = form.cleaned_data["hora"]
-            fecha = form.cleaned_data["fecha"]
-
-            with transaction.atomic():
-                # Control de cupos: evita reservas duplicadas en el mismo bloque
-                disponible, _ = HorarioDisponible.objects.get_or_create(
-                    negocio=negocio, fecha=fecha, hora=hora,
-                    defaults={"cupo_maximo": 5, "cupo_ocupado": 0},
-                )
-                if not disponible.disponible:
-                    form.add_error(None, "Ese horario ya está completo, por favor elige otro.")
-                else:
-                    reserva = form.save(commit=False)
-                    reserva.negocio = negocio
-                    reserva.hora = hora
-                    reserva.usuario = request.user if request.user.is_authenticated else None
-                    reserva.estado = Reserva.Estado.CONFIRMADA
-                    reserva.save()
-
-                    disponible.cupo_ocupado += 1
-                    disponible.save(update_fields=["cupo_ocupado"])
-
-                    return redirect("confirmacion_reserva", codigo=reserva.codigo_reserva)
+        fecha = request.POST.get("fecha")
     else:
-        form = ReservaForm(horas_disponibles=HORAS_BASE)
+        fecha = request.GET.get("fecha")
+    horas_disponibles = []
+    if fecha:
+        for hora in HORAS_BASE:
+            hora_obj = datetime.strptime(
+                hora,
+                "%H:%M"
+            ).time()
+            existe_reserva = Reserva.objects.filter(
+                negocio=negocio,
+                fecha=fecha,
+                hora=hora_obj,
+                estado=Reserva.Estado.CONFIRMADA
+            ).exists()
 
-    return render(request, "app_reservas/reserva_form.html", {
-        "form": form,
-        "negocio": negocio,
-    })
+            bloqueado = False
+            temporales = ReservaTemporal.objects.filter(
+                negocio=negocio,
+                fecha=fecha,
+                hora=hora_obj
+            )
+
+            for temp in temporales:
+                if temp.esta_activa():
+                    bloqueado = True
+                else:
+                    temp.delete()
+
+            if not existe_reserva and not bloqueado:
+                horas_disponibles.append(hora)
+
+    # ==========================
+    # GUARDAR RESERVA
+    # ==========================
+
+    if request.method == "POST":
+        form = ReservaForm(
+            request.POST,
+            horas_disponibles=horas_disponibles
+        )
+
+        if form.is_valid():
+            print(request.POST)
+            print(type(form.fields["hora"]))
+            print(form.fields["hora"])
+            reserva = form.save(
+                commit=False
+            )
+            reserva.negocio = negocio
+            if request.user.is_authenticated:
+                reserva.usuario = request.user
+            reserva.estado = Reserva.Estado.CONFIRMADA
+
+            # =================================
+            # CORRECCION: GUARDAR HORA
+            # =================================
+
+            hora_seleccionada = request.POST.get(
+                "hora"
+            )
+            if not hora_seleccionada:
+                form.add_error(
+                    "hora",
+                    "Debe seleccionar una hora"
+                )
+                return render(
+                    request,
+                    "app_reservas/reserva_form.html",
+                    {
+                        "form":form,
+                        "negocio":negocio,
+                        "horarios":horas_disponibles
+                    }
+                )
+
+            reserva.hora = datetime.strptime(
+                hora_seleccionada,
+                "%H:%M"
+            ).time()
+
+            # =================================
+            # CODIGO DE RESERVA
+            # =================================
+
+            reserva.codigo_reserva = (
+                "RES"
+                +
+                str(uuid.uuid4())
+                .replace("-","")[:8]
+                .upper()
+            )
+
+            reserva.save()
+
+            # Envía el correo de confirmación de forma asíncrona (Celery),
+            # sin bloquear la respuesta al usuario esperando al SMTP.
+            enviar_correo_confirmacion_reserva.delay(reserva.id)
+
+            # eliminar bloqueo temporal
+
+            sesion = request.session.get(
+                "sesion_id"
+            )
+
+            if sesion:
+                ReservaTemporal.objects.filter(
+                    usuario_sesion=sesion,
+                    negocio=negocio,
+                    fecha=reserva.fecha,
+                    hora=reserva.hora
+                ).delete()
+
+            return redirect(
+                "confirmacion_reserva",
+                codigo=reserva.codigo_reserva
+            )
+
+        else:
+            print("ERRORES FORMULARIO:")
+            print(form.errors)
+    else:
+        form = ReservaForm(
+            horas_disponibles=horas_disponibles
+        )
+    return render(
+        request,
+        "app_reservas/reserva_form.html",
+        {
+            "form":form,
+            "negocio":negocio,
+            "horarios":horas_disponibles
+        }
+    )
 
 
 def confirmacion_reserva(request, codigo):
@@ -253,3 +384,109 @@ def registro_view(request):
 def logout_view(request):
     logout(request)
     return redirect("index")
+
+# ============================================================
+# BLOQUEO TEMPORAL 5 MINUTOS
+# ============================================================
+
+def bloquear_mesa(request):
+    if "sesion_id" not in request.session:
+        request.session["sesion_id"] = str(
+            uuid.uuid4()
+        )
+
+    hora = request.POST.get(
+        "hora"
+    )
+    fecha = request.POST.get(
+        "fecha"
+    )
+    negocio = request.POST.get(
+        "negocio"
+    )
+
+    if not fecha or not hora:
+        return JsonResponse(
+            {
+                "estado":"error"
+            }
+        )
+
+    existentes = ReservaTemporal.objects.filter(
+        negocio_id=negocio,
+        fecha=fecha,
+        hora=hora
+    )
+
+    for e in existentes:
+        if e.esta_activa():
+            return JsonResponse(
+                {   
+                    "estado":"ocupada"
+                }
+            )
+
+        else:
+            e.delete()
+
+    ReservaTemporal.objects.create(
+        negocio_id=negocio,
+        fecha=fecha,
+        hora=hora,
+        usuario_sesion=request.session["sesion_id"]
+    )
+
+    return JsonResponse(
+        {
+            "estado":"ok"
+        }
+    )
+
+# ============================================================
+# AJAX HORARIOS DISPONIBLES
+# ============================================================
+
+def horarios_disponibles(request):
+    negocio_id = request.GET.get(
+        "negocio"
+    )
+
+    fecha = request.GET.get(
+        "fecha"
+    )
+
+    if not fecha:
+        return JsonResponse(
+            {
+                "horarios":[]
+            }
+        )
+    
+    horas = []
+    for hora in HORAS_BASE:
+        hora_obj = datetime.strptime(
+            hora,
+            "%H:%M"
+        ).time()
+
+        reservada = Reserva.objects.filter(
+            negocio_id=negocio_id,
+            fecha=fecha,
+            hora=hora_obj,
+            estado=Reserva.Estado.CONFIRMADA
+        ).exists()
+
+        bloqueada = ReservaTemporal.objects.filter(
+            negocio_id=negocio_id,
+            fecha=fecha,
+            hora=hora_obj,
+            creado__gte=timezone.now() - timedelta(minutes=5)
+        ).exists()
+
+        if not reservada and not bloqueada:
+            horas.append(hora)
+    return JsonResponse(
+        {
+            "horarios":horas
+        }
+    )
